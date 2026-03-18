@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from dotenv import load_dotenv
 from fastmcp import FastMCP
 
@@ -16,7 +18,7 @@ mcp = FastMCP("VIP Site Probe")
 
 
 @mcp.tool
-async def probe_site_tool(url: str) -> dict:
+async def probe_site_tool(url: str) -> dict[str, Any]:
     """Probe a WordPress site and produce a comprehensive diagnostic report.
 
     Fetches the site URL and /wp-json/ endpoint, reads HTTP response headers for
@@ -26,7 +28,7 @@ async def probe_site_tool(url: str) -> dict:
 
 
 @mcp.tool
-async def check_plugins_tool(url: str) -> dict:
+async def check_plugins_tool(url: str) -> dict[str, Any]:
     """Discover active plugins from REST API namespaces and cross-reference them
     against the WordPress.org Plugin API.
 
@@ -37,7 +39,7 @@ async def check_plugins_tool(url: str) -> dict:
 
 
 @mcp.tool
-async def check_security_tool(url: str) -> dict:
+async def check_security_tool(url: str) -> dict[str, Any]:
     """Check for common WordPress security exposures.
 
     Tests xmlrpc.php accessibility, user enumeration, security headers,
@@ -54,7 +56,7 @@ async def submit_to_zendesk_tool(
     priority: str = "normal",
     requester_email: str | None = None,
     tags: list[str] | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """Submit the most recent probe findings to Zendesk.
 
     Args:
