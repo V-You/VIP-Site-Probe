@@ -53,3 +53,19 @@ def test_app_resources_use_client_side_result_handlers() -> None:
         assert "@modelcontextprotocol/ext-apps" in resource
         assert "app.ontoolresult" in resource
         assert "structuredContent" in resource
+
+
+def test_app_resources_handle_tool_result_variants() -> None:
+    resources = [
+        probe_report_app_resource(),
+        probe_site_app_resource(),
+        check_plugins_app_resource(),
+        check_security_app_resource(),
+        zendesk_preview_app_resource(),
+    ]
+
+    for resource in resources:
+        assert "normalizeToolResult" in resource
+        assert "payload.toolResult" in resource
+        assert "payload.result" in resource
+        assert "No tool-result notification arrived for this widget" in resource

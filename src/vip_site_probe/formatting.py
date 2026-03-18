@@ -780,12 +780,13 @@ def _render_app_shell(title: str, eyebrow: str, waiting_message: str) -> str:
     content = f"""
     <div id="app-root">{waiting_markup}</div>
     <script type="module">
-        import {{ App }} from "{APP_SDK_URL}";
-
-        const app = new App({{ name: "VIP Site Probe", version: "0.1.0" }});
         const root = document.getElementById("app-root");
         const title = {json.dumps(title)};
         const eyebrow = {json.dumps(eyebrow)};
+        const appSdkUrls = [
+            {json.dumps(APP_SDK_URL)},
+            {json.dumps(APP_SDK_URL + ".js")},
+        ];
 
         const escapeHtml = (value) => String(value)
             .replace(/&/g, "&amp;")
@@ -807,6 +808,18 @@ def _render_app_shell(title: str, eyebrow: str, waiting_message: str) -> str:
             return "";
         }};
 
+        const normalizeToolResult = (payload) => {{
+            if (payload && typeof payload === "object") {{
+                if (payload.toolResult && typeof payload.toolResult === "object") {{
+                    return payload.toolResult;
+                }}
+                if (payload.result && typeof payload.result === "object") {{
+                    return payload.result;
+                }}
+            }}
+            return payload;
+        }};
+
         const fallbackMarkup = (text) => `
             <main class="app-shell">
                 <section class="hero">
@@ -823,21 +836,101 @@ def _render_app_shell(title: str, eyebrow: str, waiting_message: str) -> str:
             </main>
         `;
 
-        app.ontoolresult = (result) => {{
+        const structuredResultMarkup = (data) => `
+            <main class="app-shell">
+                <section class="hero">
+                    <p class="eyebrow">${{escapeHtml(eyebrow)}}</p>
+                    <h1>${{escapeHtml(title)}}</h1>
+                    <p class="subtitle">Structured tool output</p>
+                </section>
+                <div class="sections">
+                    <section class="section">
+                        <h2>Structured content</h2>
+                        <pre class="pre-block">${{escapeHtml(JSON.stringify(data, null, 2))}}</pre>
+                    </section>
+                </div>
+            </main>
+        `;
+
+        const errorMarkup = (message) => `
+            <main class="app-shell">
+                <section class="hero">
+                    <p class="eyebrow">${{escapeHtml(eyebrow)}}</p>
+                    <h1>${{escapeHtml(title)}}</h1>
+                    <p class="subtitle">Widget initialization error</p>
+                </section>
+                <div class="sections">
+                    <section class="section">
+                        <h2>Details</h2>
+                        <pre class="pre-block">${{escapeHtml(message)}}</pre>
+                    </section>
+                </div>
+            </main>
+        `;
+
+        const renderResult = (incoming) => {{
+            const result = normalizeToolResult(incoming);
             const data = result?.structuredContent ?? result?.structured_content ?? null;
             const html = data && typeof data === "object" ? data.html : null;
             if (typeof html === "string" && html.trim()) {{
                 root.innerHTML = html;
-                return;
+                return true;
             }}
 
             const text = fallbackText(result?.content);
             if (text) {{
                 root.innerHTML = fallbackMarkup(text);
+                return true;
             }}
+
+            if (data && typeof data === "object") {{
+                root.innerHTML = structuredResultMarkup(data);
+                return true;
+            }}
+
+            return false;
         }};
 
-        await app.connect();
+        const loadAppCtor = async () => {{
+            let lastError = null;
+            for (const url of appSdkUrls) {{
+                try {{
+                    const module = await import(url);
+                    if (module && typeof module.App === "function") {{
+                        return module.App;
+                    }}
+                }} catch (error) {{
+                    lastError = error;
+                }}
+            }}
+
+            throw lastError ?? new Error("Unable to load MCP Apps SDK");
+        }};
+
+        try {{
+            const App = await loadAppCtor();
+            const app = new App({{ name: "VIP Site Probe", version: "0.1.0" }});
+            let rendered = false;
+
+            app.ontoolresult = (result) => {{
+                if (renderResult(result)) {{
+                    rendered = true;
+                }}
+            }};
+
+            await app.connect();
+            setTimeout(() => {{
+                if (!rendered) {{
+                    root.innerHTML = errorMarkup(
+                        "No tool-result notification arrived for this widget. " +
+                        "The tool still completed, but the host did not hydrate this app instance."
+                    );
+                }}
+            }}, 15000);
+        }} catch (error) {{
+            const message = error instanceof Error ? error.message : String(error);
+            root.innerHTML = errorMarkup(message);
+        }}
     </script>
     """
     return create_page(content=content, title=title, additional_styles=APP_STYLES)

@@ -108,7 +108,7 @@ The single-sample POST probe is susceptible to CDN edge variability and adaptive
 
 ### Summary
 
-TechCrunch’s XML-RPC endpoint appears reachable (not unusual). Our tests do not show a block-by-default config, and also do not prove dangerous openness. The observed mix of 200 and 403 suggests conditional or edge-dependent protections. Most likely, `/probe` currently overstates risk by equating 200 text/xml with “accessible” in a security-significant sense.
+TechCrunch’s XML-RPC endpoint appears reachable (not unusual). Current tests do not show a block-by-default config, and also do not prove dangerous openness. The observed mix of 200 and 403 suggests conditional or edge-dependent protections. Most likely, `/probe` currently overstates risk by equating 200 text/xml with “accessible” in a security-significant sense.
 
 **Tool improvements:** `/probe` needs a verification step: ideally from a second POST vantage point, or corroborating with a GET to `/xmlrpc.php`. Planned: `/probe` to distinguish:
 
