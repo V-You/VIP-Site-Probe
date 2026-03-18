@@ -4,7 +4,12 @@ from vip_site_probe.server import (
     PROBE_REPORT_APP_URI,
     PROBE_SITE_APP_URI,
     ZENDESK_PREVIEW_APP_URI,
+    check_plugins_app_resource,
+    check_security_app_resource,
     mcp,
+    probe_report_app_resource,
+    probe_site_app_resource,
+    zendesk_preview_app_resource,
 )
 
 
@@ -33,3 +38,18 @@ def test_tools_expose_mcp_app_resources() -> None:
         f"resource:{ZENDESK_PREVIEW_APP_URI}@",
     }
     assert expected_resources.issubset(set(components))
+
+
+def test_app_resources_use_client_side_result_handlers() -> None:
+    resources = [
+        probe_report_app_resource(),
+        probe_site_app_resource(),
+        check_plugins_app_resource(),
+        check_security_app_resource(),
+        zendesk_preview_app_resource(),
+    ]
+
+    for resource in resources:
+        assert "@modelcontextprotocol/ext-apps" in resource
+        assert "app.ontoolresult" in resource
+        assert "structuredContent" in resource

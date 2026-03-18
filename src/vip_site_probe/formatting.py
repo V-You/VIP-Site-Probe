@@ -240,6 +240,25 @@ th {
 }
 """
 
+APP_SDK_URL = "https://unpkg.com/@modelcontextprotocol/ext-apps@0.4.0/app-with-deps"
+
+
+def format_probe_report_md(data: dict[str, Any]) -> str:
+    """Format the combined probe results as Markdown."""
+    sections = [
+        "## Probe report",
+        "",
+        f"- **timestamp:** {data.get('timestamp', '-')}",
+        f"- **target:** {data.get('url', 'unknown')}",
+        "",
+        format_site_report_md(_as_dict(data.get("site_health"))),
+        "",
+        format_plugins_table_md(_as_dict(data.get("plugin_status"))),
+        "",
+        format_security_checklist_md(_as_dict(data.get("security_findings"))),
+    ]
+    return "\n".join(section for section in sections if section)
+
 
 def format_site_report_md(data: dict[str, Any]) -> str:
     """Format probe_site results as Markdown."""
@@ -304,6 +323,28 @@ def format_security_checklist_md(data: dict[str, Any]) -> str:
         label = finding.get("label", "?")
         detail = finding.get("detail", "")
         lines.append(f"- **[{severity}]** {label}: {detail}")
+    return "\n".join(lines)
+
+
+def format_zendesk_preview_md(data: dict[str, Any]) -> str:
+    """Format submit_to_zendesk results as Markdown."""
+    if error := data.get("error"):
+        return f"## Zendesk preview\n\n- **error:** {error}"
+
+    lines = [
+        "## Zendesk preview",
+        "",
+        f"- **mode:** {data.get('mode', data.get('status', 'unknown'))}",
+        f"- **action:** {data.get('action', '-')}",
+        f"- **ticket_id:** {data.get('ticket_id', 'new')}",
+        f"- **probed_url:** {data.get('probed_url', 'unknown')}",
+    ]
+    if note := data.get("note"):
+        lines.append(f"- **note:** {note}")
+    if payload := _as_dict(data.get("payload")):
+        lines.extend(["", "```json", json.dumps(payload, indent=2, sort_keys=True), "```"])
+    elif detail := data.get("detail"):
+        lines.extend(["", f"- **detail:** {detail}"])
     return "\n".join(lines)
 
 
@@ -432,6 +473,15 @@ def render_probe_report_app(data: dict[str, Any] | None) -> str:
     )
 
 
+def render_probe_report_app_shell() -> str:
+    """Render the static combined probe MCP App shell."""
+    return _render_app_shell(
+        title="Probe report",
+        eyebrow="Probe",
+        waiting_message="Run probe_tool to populate the combined diagnostic report.",
+    )
+
+
 def render_site_probe_app(data: dict[str, Any] | None) -> str:
     """Render the probe_site MCP App from the most recent cached result."""
     if not data:
@@ -492,6 +542,15 @@ def render_site_probe_app(data: dict[str, Any] | None) -> str:
     )
 
 
+def render_site_probe_app_shell() -> str:
+    """Render the static site probe MCP App shell."""
+    return _render_app_shell(
+        title="Site health",
+        eyebrow="Probe site",
+        waiting_message="Run probe_site_tool to populate the site dashboard.",
+    )
+
+
 def render_plugins_app(data: dict[str, Any] | None) -> str:
     """Render the check_plugins MCP App from the most recent cached result."""
     if not data:
@@ -542,6 +601,15 @@ def render_plugins_app(data: dict[str, Any] | None) -> str:
         eyebrow="Check plugins",
         subtitle=_safe_text(data.get("url", "unknown")),
         body=cards + _wrap_sections(sections),
+    )
+
+
+def render_plugins_app_shell() -> str:
+    """Render the static plugin MCP App shell."""
+    return _render_app_shell(
+        title="Plugin status",
+        eyebrow="Check plugins",
+        waiting_message="Run check_plugins_tool to populate the plugin table.",
     )
 
 
@@ -603,6 +671,15 @@ def render_security_app(data: dict[str, Any] | None) -> str:
     )
 
 
+def render_security_app_shell() -> str:
+    """Render the static security MCP App shell."""
+    return _render_app_shell(
+        title="Security findings",
+        eyebrow="Check security",
+        waiting_message="Run check_security_tool to populate the security report.",
+    )
+
+
 def render_zendesk_preview_app(data: dict[str, Any] | None) -> str:
     """Render the submit_to_zendesk MCP App from the most recent cached result."""
     if not data:
@@ -643,7 +720,9 @@ def render_zendesk_preview_app(data: dict[str, Any] | None) -> str:
             },
         )
     ]
-    if payload:
+    if error := data.get("error"):
+        sections.append(_render_code_section("Error", str(error)))
+    elif payload:
         sections.append(
             _render_code_section("Payload", json.dumps(payload, indent=2, sort_keys=True))
         )
@@ -658,9 +737,18 @@ def render_zendesk_preview_app(data: dict[str, Any] | None) -> str:
     )
 
 
+def render_zendesk_preview_app_shell() -> str:
+    """Render the static Zendesk preview MCP App shell."""
+    return _render_app_shell(
+        title="Zendesk preview",
+        eyebrow="Submit to Zendesk",
+        waiting_message="Run submit_to_zendesk_tool to preview or confirm a ticket action.",
+    )
+
+
 def _render_page(title: str, eyebrow: str, subtitle: str, body: str) -> str:
-    """Render a complete HTML page for an MCP App resource."""
-    content = f"""
+    """Render the core markup shown inside an MCP App iframe."""
+    return f"""
     <main class="app-shell">
         <section class="hero">
             <p class="eyebrow">{_safe_text(eyebrow)}</p>
@@ -670,13 +758,89 @@ def _render_page(title: str, eyebrow: str, subtitle: str, body: str) -> str:
         {body}
     </main>
     """
-    return create_page(content=content, title=title, additional_styles=APP_STYLES)
 
 
 def _render_empty_page(title: str, eyebrow: str, message: str) -> str:
-    """Render a neutral empty-state app page."""
+    """Render a neutral empty-state app fragment."""
     body = f"<section class=\"empty-state\"><p class=\"muted\">{_safe_text(message)}</p></section>"
     return _render_page(title=title, eyebrow=eyebrow, subtitle="No cached result", body=body)
+
+
+def _render_app_shell(title: str, eyebrow: str, waiting_message: str) -> str:
+    """Render a static HTML shell that hydrates from the host tool result."""
+    waiting_markup = _render_page(
+        title=title,
+        eyebrow=eyebrow,
+        subtitle="Waiting for tool result",
+        body=(
+            f"<section class=\"empty-state\"><p class=\"muted\">"
+            f"{_safe_text(waiting_message)}</p></section>"
+        ),
+    )
+    content = f"""
+    <div id="app-root">{waiting_markup}</div>
+    <script type="module">
+        import {{ App }} from "{APP_SDK_URL}";
+
+        const app = new App({{ name: "VIP Site Probe", version: "0.1.0" }});
+        const root = document.getElementById("app-root");
+        const title = {json.dumps(title)};
+        const eyebrow = {json.dumps(eyebrow)};
+
+        const escapeHtml = (value) => String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+
+        const fallbackText = (content) => {{
+            if (typeof content === "string") {{
+                return content;
+            }}
+            if (Array.isArray(content)) {{
+                return content
+                    .filter((block) => block && block.type === "text")
+                    .map((block) => block.text ?? "")
+                    .join("\\n\\n");
+            }}
+            return "";
+        }};
+
+        const fallbackMarkup = (text) => `
+            <main class="app-shell">
+                <section class="hero">
+                    <p class="eyebrow">${{escapeHtml(eyebrow)}}</p>
+                    <h1>${{escapeHtml(title)}}</h1>
+                    <p class="subtitle">Model text output</p>
+                </section>
+                <div class="sections">
+                    <section class="section">
+                        <h2>Summary</h2>
+                        <pre class="pre-block">${{escapeHtml(text)}}</pre>
+                    </section>
+                </div>
+            </main>
+        `;
+
+        app.ontoolresult = (result) => {{
+            const data = result?.structuredContent ?? result?.structured_content ?? null;
+            const html = data && typeof data === "object" ? data.html : null;
+            if (typeof html === "string" && html.trim()) {{
+                root.innerHTML = html;
+                return;
+            }}
+
+            const text = fallbackText(result?.content);
+            if (text) {{
+                root.innerHTML = fallbackMarkup(text);
+            }}
+        }};
+
+        await app.connect();
+    </script>
+    """
+    return create_page(content=content, title=title, additional_styles=APP_STYLES)
 
 
 def _render_cards(cards: list[str]) -> str:

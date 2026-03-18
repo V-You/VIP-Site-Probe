@@ -51,7 +51,7 @@ async def submit_to_zendesk(
     # dry-run mode -- return the payload as a preview
     dry_run = os.getenv("ZENDESK_DRY_RUN", "true").lower() != "false"
     if dry_run:
-        result: dict[str, Any] = {
+        return {
             "mode": "dry-run",
             "action": action,
             "ticket_id": ticket_id,
@@ -59,13 +59,10 @@ async def submit_to_zendesk(
             "payload": payload,
             "note": "Set ZENDESK_DRY_RUN=false to actually send.",
         }
-        cache.store("submit_to_zendesk", probed_url, result)
-        return result
 
     # live mode -- send to Zendesk
     result = await _send_to_zendesk(action, ticket_id, payload)
     result["probed_url"] = probed_url
-    cache.store("submit_to_zendesk", probed_url, result)
     return result
 
 

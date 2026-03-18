@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import urlparse
 
-from vip_site_probe.cache import cache
 from vip_site_probe.probes.plugins import check_plugins
 from vip_site_probe.probes.security import check_security
 from vip_site_probe.probes.site import probe_site
@@ -30,7 +29,6 @@ async def probe(url: str) -> dict[str, Any]:
         "plugin_status": plugin_status,
         "security_findings": security_findings,
     }
-    cache.store("probe", report_url, result)
     return result
 
 
