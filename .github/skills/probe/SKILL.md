@@ -17,3 +17,4 @@ Run `probe_site`, `check_plugins`, and `check_security` in sequence against `{ur
    - Site health (identity, infrastructure, CDN, REST API)
    - Plugin status (table with version currency and health flags)
    - Security findings (checklist with severity badges)
+   - Add the output's timestamp
