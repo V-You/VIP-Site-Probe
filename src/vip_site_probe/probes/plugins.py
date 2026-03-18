@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any
+from typing import Any, cast
 from urllib.parse import urlparse
 
 import httpx
@@ -18,7 +18,7 @@ NAMESPACE_PLUGIN_MAP: dict[str, str] = {
     "jp": "jetpack",
     "wc": "woocommerce",
     "yoast": "wordpress-seo",
-    "wp-parsely": "developer-tools",
+    "wp-parsely": "wp-parsely",
     "acf": "advanced-custom-fields",
     "redirection": "redirection",
     "contact-form-7": "contact-form-7",
@@ -101,8 +101,9 @@ async def _fetch_plugin_info(client: httpx.AsyncClient, slug: str) -> dict[str, 
             params={"action": "plugin_information", "request[slug]": slug},
         )
         if resp.status_code == 200:
-            data = resp.json()
-            if isinstance(data, dict) and "name" in data:
+            data_raw = resp.json()
+            if isinstance(data_raw, dict) and "name" in data_raw:
+                data = cast(dict[str, Any], data_raw)
                 info["name"] = data.get("name", slug)
                 info["latest_version"] = data.get("version", "?")
                 info["last_updated"] = data.get("last_updated", "?")
