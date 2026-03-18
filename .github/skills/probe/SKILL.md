@@ -1,5 +1,7 @@
 ---
+name: "probe"
 description: "Run a full WordPress site diagnostic -- probes site health, plugin status, and security exposures, then presents a unified report."
+argument-hint: "[url]"
 ---
 
 # /probe {url}

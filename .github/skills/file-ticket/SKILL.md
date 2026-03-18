@@ -1,5 +1,7 @@
 ---
+name: "file-ticket"
 description: "Run a full site probe and create a new Zendesk ticket with the findings."
+argument-hint: "[url]"
 ---
 
 # /file-ticket {url}

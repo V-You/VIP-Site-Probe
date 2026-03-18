@@ -1,5 +1,7 @@
 ---
+name: "add-to-ticket"
 description: "Run a full site probe and add the findings as an internal note on an existing Zendesk ticket."
+argument-hint: "[url] [ticket_id]"
 ---
 
 # /add-to-ticket {url} {ticket_id}
