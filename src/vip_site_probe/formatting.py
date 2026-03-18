@@ -323,6 +323,115 @@ def format_zendesk_html(results: list[dict[str, Any]]) -> str:
     return "<br>".join(sections) if sections else "<p>No probe results cached.</p>"
 
 
+def render_probe_report_app(data: dict[str, Any] | None) -> str:
+    """Render the combined probe MCP App from the most recent cached result."""
+    if not data:
+        return _render_empty_page(
+            title="Probe report",
+            eyebrow="Probe",
+            message="Run probe_tool to populate the combined diagnostic report.",
+        )
+
+    site_health = _as_dict(data.get("site_health"))
+    identity = _as_dict(site_health.get("identity"))
+    infrastructure = _as_dict(site_health.get("infrastructure"))
+    rest_api = _as_dict(site_health.get("rest_api"))
+    content = _as_dict(site_health.get("content"))
+    namespaces = [ns for ns in _as_list(rest_api.get("namespaces")) if isinstance(ns, str)]
+    cdn = [name for name in _as_list(site_health.get("cdn")) if isinstance(name, str)]
+
+    plugin_status = _as_dict(data.get("plugin_status"))
+    plugins = _dicts_from_list(plugin_status.get("plugins"))
+
+    security_findings = _as_dict(data.get("security_findings"))
+    findings = _dicts_from_list(security_findings.get("findings"))
+    xmlrpc = _as_dict(security_findings.get("xmlrpc"))
+    review_findings = sum(
+        1
+        for finding in findings
+        if finding.get("severity") in {"warning", "critical"}
+    )
+
+    cards = _render_cards(
+        [
+            _metric_card(
+                "Cache",
+                infrastructure.get("x-cache", "unknown"),
+                "Homepage cache state",
+            ),
+            _metric_card(
+                "TTFB",
+                _format_ttfb(infrastructure.get("ttfb_seconds")),
+                "Time to first byte for the homepage",
+            ),
+            _metric_card(
+                "Plugins",
+                len(plugins),
+                "Detected plugins with status metadata",
+            ),
+            _metric_card(
+                "Needs review",
+                review_findings,
+                "Warning or critical security findings",
+            ),
+        ]
+    )
+
+    sections = [
+        _render_key_value_section(
+            "Report summary",
+            {
+                "url": data.get("url", "unknown"),
+                "generated_at": data.get("timestamp", "-"),
+                "rest_api_status": rest_api.get("status", "unknown"),
+                "routes": content.get("route_count", "-"),
+            },
+        ),
+        _render_intro_section(
+            "Site health",
+            "Identity, infrastructure, CDN, and REST API signals from the latest run.",
+        ),
+        _render_key_value_section("Site identity", identity),
+        _render_key_value_section("Infrastructure signals", infrastructure),
+    ]
+    if namespaces:
+        sections.append(_render_chip_section("Namespaces", namespaces))
+    if cdn:
+        sections.append(_render_chip_section("CDN indicators", cdn))
+
+    sections.append(
+        _render_intro_section(
+            "Plugin status",
+            "Version currency and health flags from detected plugins.",
+        )
+    )
+    if plugins:
+        sections.append(_render_plugins_table(plugins))
+    else:
+        sections.append(_render_empty_section("No plugins were detected in the latest run."))
+
+    sections.append(
+        _render_intro_section(
+            "Security findings",
+            "Checklist with severity badges and XML-RPC posture evidence.",
+        )
+    )
+    if xmlrpc:
+        sections.append(_render_xmlrpc_section(xmlrpc))
+    sections.append(_render_findings_section(findings))
+
+    subtitle_parts = [_display_value(data.get("url", "unknown"))]
+    if timestamp := data.get("timestamp"):
+        subtitle_parts.append(f"Generated {timestamp}")
+
+    return _render_page(
+        title="Probe report",
+        eyebrow="Probe",
+        subtitle=_safe_text(" | ".join(subtitle_parts)),
+        body=cards + _wrap_sections(sections),
+    )
+
+
 def render_site_probe_app(data: dict[str, Any] | None) -> str:
     """Render the probe_site MCP App from the most recent cached result."""
     if not data:
@@ -762,6 +871,16 @@ def _render_code_section(title: str, payload: str) -> str:
     """
 
 
+def _render_intro_section(title: str, message: str) -> str:
+    """Render a simple section heading with supporting copy."""
+    return f"""
+    <section class="section">
+        <h2>{_safe_text(title)}</h2>
+        <p class="muted">{_safe_text(message)}</p>
+    </section>
+    """
+
+
 def _render_empty_section(message: str) -> str:
     """Render a section-level empty state."""
     return f"""
@@ -792,7 +911,8 @@ def _format_ttfb(value: Any) -> str:
 def _display_value(value: Any) -> str:
     """Convert nested JSON-ish values into compact text."""
     if isinstance(value, list):
-        return ", ".join(_display_value(item) for item in value) or "-"
+        items = cast(list[Any], value)
+        return ", ".join(_display_value(item) for item in items) or "-"
     if isinstance(value, dict):
         return json.dumps(value, sort_keys=True)
     if value in (None, ""):
@@ -828,7 +948,7 @@ def _as_dict(value: Any) -> dict[str, Any]:
 
 def _as_list(value: Any) -> list[Any]:
     """Return a list[Any] view of JSON-like data or an empty list."""
-    return value if isinstance(value, list) else []
+    return cast(list[Any], value) if isinstance(value, list) else []
 
 
 def _dicts_from_list(value: Any) -> list[dict[str, Any]]:

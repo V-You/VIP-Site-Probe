@@ -11,11 +11,13 @@ from fastmcp.server.apps import AppConfig
 from vip_site_probe.cache import cache
 from vip_site_probe.formatting import (
     render_plugins_app,
+    render_probe_report_app,
     render_security_app,
     render_site_probe_app,
     render_zendesk_preview_app,
 )
 from vip_site_probe.probes.plugins import check_plugins
+from vip_site_probe.probes.report import probe
 from vip_site_probe.probes.security import check_security
 from vip_site_probe.probes.site import probe_site
 from vip_site_probe.zendesk import submit_to_zendesk
@@ -24,10 +26,23 @@ load_dotenv()
 
 mcp = FastMCP("VIP Site Probe")
 
+PROBE_REPORT_APP_URI = "ui://vip-site-probe/probe-report"
 PROBE_SITE_APP_URI = "ui://vip-site-probe/probe-site"
 CHECK_PLUGINS_APP_URI = "ui://vip-site-probe/check-plugins"
 CHECK_SECURITY_APP_URI = "ui://vip-site-probe/check-security"
 ZENDESK_PREVIEW_APP_URI = "ui://vip-site-probe/zendesk-preview"
+
+
+@mcp.resource(
+    PROBE_REPORT_APP_URI,
+    title="Combined probe report",
+    description="Unified dashboard for the most recent probe result.",
+    app=AppConfig(prefersBorder=True),
+)
+def probe_report_app_resource() -> str:
+    """Render the most recent probe result as an MCP App."""
+    cached = cache.get("probe")
+    return render_probe_report_app(cached.data if cached else None)
 
 
 @mcp.resource(
@@ -76,6 +91,12 @@ def zendesk_preview_app_resource() -> str:
     """Render the most recent submit_to_zendesk result as an MCP App."""
     cached = cache.get("submit_to_zendesk")
     return render_zendesk_preview_app(cached.data if cached else None)
+
+
+@mcp.tool(app=AppConfig(resourceUri=PROBE_REPORT_APP_URI, prefersBorder=True))
+async def probe_tool(url: str) -> dict[str, Any]:
+    """Run the full WordPress diagnostic and return a unified report."""
+    return await probe(url)
 
 
 @mcp.tool(app=AppConfig(resourceUri=PROBE_SITE_APP_URI, prefersBorder=True))

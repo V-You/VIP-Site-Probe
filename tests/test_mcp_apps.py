@@ -1,6 +1,7 @@
 from vip_site_probe.server import (
     CHECK_PLUGINS_APP_URI,
     CHECK_SECURITY_APP_URI,
+    PROBE_REPORT_APP_URI,
     PROBE_SITE_APP_URI,
     ZENDESK_PREVIEW_APP_URI,
     mcp,
@@ -12,6 +13,7 @@ def test_tools_expose_mcp_app_resources() -> None:
     components = provider._components
 
     expected_tool_meta = {
+        "tool:probe_tool@": PROBE_REPORT_APP_URI,
         "tool:probe_site_tool@": PROBE_SITE_APP_URI,
         "tool:check_plugins_tool@": CHECK_PLUGINS_APP_URI,
         "tool:check_security_tool@": CHECK_SECURITY_APP_URI,
@@ -24,6 +26,7 @@ def test_tools_expose_mcp_app_resources() -> None:
         assert tool.meta["ui"]["resourceUri"] == resource_uri
 
     expected_resources = {
+        f"resource:{PROBE_REPORT_APP_URI}@",
         f"resource:{PROBE_SITE_APP_URI}@",
         f"resource:{CHECK_PLUGINS_APP_URI}@",
         f"resource:{CHECK_SECURITY_APP_URI}@",

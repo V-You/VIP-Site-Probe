@@ -19,6 +19,7 @@ python -m vip_site_probe
 
 | Tool | Description |
 |------|-------------|
+| `probe_tool` | Full combined diagnostic -- runs site health, plugin status, and security checks in one MCP App |
 | `probe_site_tool` | Full site diagnostic -- identity, infrastructure, REST API, CDN |
 | `check_plugins_tool` | Plugin discovery via REST API namespaces + wordpress.org cross-reference |
 | `check_security_tool` | Security exposure scan -- xmlrpc, user enum, headers, directory listing |
