@@ -42,7 +42,10 @@ PROBE_SITE_APP_URI = "ui://vip-site-probe/probe-site"
 CHECK_PLUGINS_APP_URI = "ui://vip-site-probe/check-plugins"
 CHECK_SECURITY_APP_URI = "ui://vip-site-probe/check-security"
 ZENDESK_PREVIEW_APP_URI = "ui://vip-site-probe/zendesk-preview"
-APP_RESOURCE_CSP = ResourceCSP(resourceDomains=["https://unpkg.com"])
+APP_RESOURCE_CSP = ResourceCSP(
+    resourceDomains=["https://unpkg.com"],
+    connectDomains=["https://unpkg.com"],
+)
 
 
 def _tool_result(

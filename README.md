@@ -2,6 +2,33 @@
 
 MCP server that probes WordPress sites via their public REST API and HTTP headers, producing CSE intake reports and optionally pushing findings to Zendesk.
 
+<table>
+    <thead>
+        <tr>
+            <th>
+                <kbd><b>/probe</b></kbd> <sub>techcrunch.com</sub>
+            </th>
+            <th>
+                <kbd><b>/file-ticket</b></kbd> <sub>blogs.microsoft.com/</sub>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td valign="top" align="center">
+                <kbd>
+                    <img src="img/techcrunch.webp" alt="Probe output" width="111">
+                </kbd>
+            </td>
+            <td valign="top" align="center">
+                <kbd>
+                    <img src="img/blogmicrosoft.webp" alt="Probe + file ticket" width="111">
+                </kbd>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
 ## Quick start
 
 ```bash

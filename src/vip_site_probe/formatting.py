@@ -240,7 +240,7 @@ th {
 }
 """
 
-APP_SDK_URL = "https://unpkg.com/@modelcontextprotocol/ext-apps@0.4.0/app-with-deps"
+APP_SDK_URL = "https://unpkg.com/@modelcontextprotocol/ext-apps@1.2.2/dist/src/app-with-deps.js"
 
 
 def format_probe_report_md(data: dict[str, Any]) -> str:
@@ -785,7 +785,6 @@ def _render_app_shell(title: str, eyebrow: str, waiting_message: str) -> str:
         const eyebrow = {json.dumps(eyebrow)};
         const appSdkUrls = [
             {json.dumps(APP_SDK_URL)},
-            {json.dumps(APP_SDK_URL + ".js")},
         ];
 
         const escapeHtml = (value) => String(value)
