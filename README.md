@@ -17,12 +17,12 @@ MCP server that probes WordPress sites via their public REST API and HTTP header
         <tr>
             <td valign="top" align="center">
                 <kbd>
-                    <img src="img/techcrunch.webp" alt="Probe output" width="111">
+                    <img src="img/techcrunch-probe.webp" alt="Probe output" width="111">
                 </kbd>
             </td>
             <td valign="top" align="center">
                 <kbd>
-                    <img src="img/blogmicrosoft.webp" alt="Probe + file ticket" width="111">
+                    <img src="img/techcrunch-ticket.png" alt="Probe + file ticket" width="111">
                 </kbd>
             </td>
         </tr>
