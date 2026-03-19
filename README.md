@@ -6,10 +6,10 @@ MCP server that probes WordPress sites via their public REST API and HTTP header
     <thead>
         <tr>
             <th>
-                <kbd><b>/probe</b></kbd> techcrunch.com
+                <kbd><b>/probe</b></kbd> domain.com
             </th>
             <th>
-                <kbd><b>/file-ticket</b></kbd> blogs.microsoft.com/
+                <kbd><b>/file-ticket</b></kbd> domain.com
             </th>
         </tr>
     </thead>
