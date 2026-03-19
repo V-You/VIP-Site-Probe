@@ -1,6 +1,6 @@
 # VIP Site Probe
 
-MCP server that probes WordPress sites via their public REST API and HTTP headers, producing CSE intake reports and optionally pushing findings to Zendesk.
+MCP server that probes WordPress sites via their public REST API and HTTP headers, producing CSE intake reports and optionally pushing findings to Zendesk. This is the perfect tool for a Customer Success Engineer, or Technical Support Engineer. The tool delivers actionable insights directly in the IDE. Discovery > Action. Docs as tool. 
 
 <table>
     <thead>
