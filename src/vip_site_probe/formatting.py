@@ -242,6 +242,16 @@ th {
 
 APP_SDK_URL = "https://unpkg.com/@modelcontextprotocol/ext-apps@1.2.2/dist/src/app-with-deps.js"
 
+# CSP for app shells -- must allow inline scripts and the unpkg CDN import
+APP_SHELL_CSP = (
+    "default-src 'none'; "
+    "script-src 'unsafe-inline' https://unpkg.com; "
+    "style-src 'unsafe-inline'; "
+    "img-src https: data:; "
+    "connect-src https://unpkg.com; "
+    "base-uri 'none'"
+)
+
 
 def format_probe_report_md(data: dict[str, Any]) -> str:
     """Format the combined probe results as Markdown."""
@@ -746,6 +756,19 @@ def render_zendesk_preview_app_shell() -> str:
     )
 
 
+def render_as_full_page(fragment: str) -> str:
+    """Wrap a rendered HTML fragment in a standalone page for direct host rendering.
+
+    Used for structured_content["html"] so the widget renders correctly even
+    when the host injects the HTML directly (without the App SDK path).
+    """
+    return create_page(
+        content=fragment,
+        title="VIP Site Probe",
+        additional_styles=APP_STYLES,
+    )
+
+
 def _render_page(title: str, eyebrow: str, subtitle: str, body: str) -> str:
     """Render the core markup shown inside an MCP App iframe."""
     return f"""
@@ -932,7 +955,12 @@ def _render_app_shell(title: str, eyebrow: str, waiting_message: str) -> str:
         }}
     </script>
     """
-    return create_page(content=content, title=title, additional_styles=APP_STYLES)
+    return create_page(
+        content=content,
+        title=title,
+        additional_styles=APP_STYLES,
+        csp_policy=APP_SHELL_CSP,
+    )
 
 
 def _render_cards(cards: list[str]) -> str:

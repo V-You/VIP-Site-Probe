@@ -16,6 +16,7 @@ from vip_site_probe.formatting import (
     format_security_checklist_md,
     format_site_report_md,
     format_zendesk_preview_md,
+    render_as_full_page,
     render_plugins_app,
     render_plugins_app_shell,
     render_probe_report_app,
@@ -55,7 +56,7 @@ def _tool_result(
 ) -> ToolResult:
     """Build a ToolResult with full structured data and pre-rendered widget HTML."""
     structured_content = dict(data)
-    structured_content["html"] = renderer(data)
+    structured_content["html"] = render_as_full_page(renderer(data))
     return ToolResult(content=summary, structured_content=structured_content)
 
 
