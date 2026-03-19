@@ -11,11 +11,14 @@ from fastmcp.server.apps import AppConfig, ResourceCSP
 from fastmcp.tools import ToolResult
 
 from vip_site_probe.formatting import (
+    format_file_ticket_md,
     format_plugins_table_md,
     format_probe_report_md,
     format_security_checklist_md,
     format_site_report_md,
     format_zendesk_preview_md,
+    render_file_ticket_app,
+    render_file_ticket_app_shell,
     render_as_full_page,
     render_plugins_app,
     render_plugins_app_shell,
@@ -38,6 +41,7 @@ load_dotenv()
 
 mcp = FastMCP("VIP Site Probe")
 
+FILE_TICKET_APP_URI = "ui://vip-site-probe/file-ticket"
 PROBE_REPORT_APP_URI = "ui://vip-site-probe/probe-report"
 PROBE_SITE_APP_URI = "ui://vip-site-probe/probe-site"
 CHECK_PLUGINS_APP_URI = "ui://vip-site-probe/check-plugins"
@@ -58,6 +62,17 @@ def _tool_result(
     structured_content = dict(data)
     structured_content["html"] = render_as_full_page(renderer(data))
     return ToolResult(content=summary, structured_content=structured_content)
+
+
+@mcp.resource(
+    FILE_TICKET_APP_URI,
+    title="File ticket workflow",
+    description="Unified dashboard for the latest file_ticket workflow result.",
+    app=AppConfig(prefersBorder=True, csp=APP_RESOURCE_CSP),
+)
+def file_ticket_app_resource() -> str:
+    """Render the static file_ticket MCP App shell."""
+    return render_file_ticket_app_shell()
 
 
 @mcp.resource(
@@ -120,6 +135,32 @@ async def probe_tool(url: str) -> ToolResult:
     """Run the full WordPress diagnostic and return a unified report."""
     data = await probe(url)
     return _tool_result(data, format_probe_report_md(data), render_probe_report_app)
+
+
+@mcp.tool(app=AppConfig(resourceUri=FILE_TICKET_APP_URI, prefersBorder=True))
+async def file_ticket_tool(
+    url: str,
+    subject: str | None = None,
+    priority: str = "normal",
+    requester_email: str | None = None,
+    tags: list[str] | None = None,
+) -> ToolResult:
+    """Run the full probe workflow and preview or create a Zendesk ticket."""
+    probe_data = await probe(url)
+    zendesk_data = await submit_to_zendesk(
+        action="create",
+        subject=subject,
+        priority=priority,
+        requester_email=requester_email,
+        tags=tags,
+    )
+    data = {
+        "url": probe_data.get("url", url),
+        "timestamp": probe_data.get("timestamp"),
+        "probe_report": probe_data,
+        "zendesk_result": zendesk_data,
+    }
+    return _tool_result(data, format_file_ticket_md(data), render_file_ticket_app)
 
 
 @mcp.tool(app=AppConfig(resourceUri=PROBE_SITE_APP_URI, prefersBorder=True))

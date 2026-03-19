@@ -1,11 +1,13 @@
 from vip_site_probe.server import (
     CHECK_PLUGINS_APP_URI,
     CHECK_SECURITY_APP_URI,
+    FILE_TICKET_APP_URI,
     PROBE_REPORT_APP_URI,
     PROBE_SITE_APP_URI,
     ZENDESK_PREVIEW_APP_URI,
     check_plugins_app_resource,
     check_security_app_resource,
+    file_ticket_app_resource,
     mcp,
     probe_report_app_resource,
     probe_site_app_resource,
@@ -18,6 +20,7 @@ def test_tools_expose_mcp_app_resources() -> None:
     components = provider._components
 
     expected_tool_meta = {
+        "tool:file_ticket_tool@": FILE_TICKET_APP_URI,
         "tool:probe_tool@": PROBE_REPORT_APP_URI,
         "tool:probe_site_tool@": PROBE_SITE_APP_URI,
         "tool:check_plugins_tool@": CHECK_PLUGINS_APP_URI,
@@ -31,6 +34,7 @@ def test_tools_expose_mcp_app_resources() -> None:
         assert tool.meta["ui"]["resourceUri"] == resource_uri
 
     expected_resources = {
+        f"resource:{FILE_TICKET_APP_URI}@",
         f"resource:{PROBE_REPORT_APP_URI}@",
         f"resource:{PROBE_SITE_APP_URI}@",
         f"resource:{CHECK_PLUGINS_APP_URI}@",
@@ -42,6 +46,7 @@ def test_tools_expose_mcp_app_resources() -> None:
 
 def test_app_resources_use_client_side_result_handlers() -> None:
     resources = [
+        file_ticket_app_resource(),
         probe_report_app_resource(),
         probe_site_app_resource(),
         check_plugins_app_resource(),
@@ -57,6 +62,7 @@ def test_app_resources_use_client_side_result_handlers() -> None:
 
 def test_app_resources_handle_tool_result_variants() -> None:
     resources = [
+        file_ticket_app_resource(),
         probe_report_app_resource(),
         probe_site_app_resource(),
         check_plugins_app_resource(),

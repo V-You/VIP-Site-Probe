@@ -12,7 +12,7 @@ APP_STYLES = """
 body {
     display: block;
     min-height: 100vh;
-    padding: 24px;
+    padding: 12px;
     background:
         radial-gradient(circle at top left, #fff6e6 0%, transparent 36%),
         linear-gradient(180deg, #fffdfa 0%, #f2f7ff 100%);
@@ -23,19 +23,20 @@ body {
 .app-shell {
     max-width: 1120px;
     margin: 0 auto;
+    min-width: 0;
 }
 
 .hero {
-    padding: 28px 30px;
+    padding: 14px 16px;
     border: 1px solid #d7dfeb;
-    border-radius: 24px;
+    border-radius: 3px;
     background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
     box-shadow: 0 14px 34px rgba(20, 33, 61, 0.08);
 }
 
 .eyebrow {
-    margin: 0 0 8px;
-    font-size: 12px;
+    margin: 0 0 4px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -44,92 +45,97 @@ body {
 
 .hero h1 {
     margin: 0;
-    font-size: 34px;
+    font-size: 26px;
     line-height: 1.1;
     font-family: Georgia, 'Times New Roman', serif;
 }
 
 .subtitle {
-    margin: 12px 0 0;
+    margin: 6px 0 0;
     color: #44546f;
-    font-size: 15px;
+    font-size: 13px;
 }
 
 .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 14px;
-    margin-top: 18px;
+    gap: 8px;
+    margin-top: 10px;
+    min-width: 0;
 }
 
 .metric-card,
 .section,
 .empty-state {
     border: 1px solid #d7dfeb;
-    border-radius: 20px;
+    border-radius: 3px;
     background: rgba(255, 255, 255, 0.92);
     box-shadow: 0 8px 24px rgba(20, 33, 61, 0.05);
+    min-width: 0;
 }
 
 .metric-card {
-    padding: 18px;
+    padding: 10px;
 }
 
 .metric-label {
     color: #6b7280;
-    font-size: 12px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
 
 .metric-value {
-    margin-top: 10px;
-    font-size: 26px;
+    margin-top: 4px;
+    font-size: 20px;
     font-weight: 700;
 }
 
 .metric-help {
-    margin-top: 8px;
+    margin-top: 4px;
     color: #54657d;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .sections {
     display: grid;
-    gap: 16px;
-    margin-top: 18px;
+    gap: 8px;
+    margin-top: 10px;
+    min-width: 0;
 }
 
 .section {
-    padding: 22px;
+    padding: 12px;
 }
 
 .section h2 {
-    margin: 0 0 16px;
-    font-size: 20px;
+    margin: 0 0 8px;
+    font-size: 16px;
     font-family: Georgia, 'Times New Roman', serif;
 }
 
 .table-wrap {
     overflow-x: auto;
+    max-width: 100%;
+    min-width: 0;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 th,
 td {
-    padding: 12px 10px;
+    padding: 7px 6px;
     border-bottom: 1px solid #e7edf5;
     text-align: left;
     vertical-align: top;
 }
 
 th {
-    font-size: 12px;
+    font-size: 11px;
     color: #6b7280;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -138,16 +144,16 @@ th {
 .chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
 }
 
 .chip,
 .badge {
     display: inline-flex;
     align-items: center;
-    border-radius: 999px;
-    padding: 6px 10px;
-    font-size: 12px;
+    border-radius: 3px;
+    padding: 3px 6px;
+    font-size: 11px;
     font-weight: 700;
 }
 
@@ -179,19 +185,19 @@ th {
 
 .finding-list {
     display: grid;
-    gap: 12px;
+    gap: 8px;
 }
 
 .finding {
-    padding: 14px 16px;
+    padding: 10px 12px;
     border: 1px solid #e3e8ef;
-    border-radius: 16px;
+    border-radius: 3px;
     background: #fcfdff;
 }
 
 .finding-head {
     display: flex;
-    gap: 10px;
+    gap: 6px;
     align-items: center;
     flex-wrap: wrap;
 }
@@ -202,40 +208,45 @@ th {
 
 .finding-detail,
 .muted {
-    margin-top: 8px;
+    margin-top: 4px;
     color: #54657d;
 }
 
 .empty-state {
-    margin-top: 18px;
-    padding: 28px;
+    margin-top: 10px;
+    padding: 14px;
     text-align: center;
 }
 
 .pre-block {
     margin: 0;
-    padding: 18px;
-    border-radius: 16px;
+    padding: 10px;
+    border-radius: 3px;
     background: #16202f;
     color: #eff5ff;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     overflow-x: auto;
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: 12px;
+    line-height: 1.35;
 }
 
 @media (max-width: 720px) {
     body {
-        padding: 12px;
+        padding: 8px;
     }
 
     .hero,
     .section,
     .empty-state {
-        padding: 18px;
+        padding: 10px;
     }
 
     .hero h1 {
-        font-size: 28px;
+        font-size: 22px;
     }
 }
 """
@@ -358,6 +369,20 @@ def format_zendesk_preview_md(data: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def format_file_ticket_md(data: dict[str, Any]) -> str:
+    """Format the file_ticket workflow result as Markdown."""
+    probe_report = _as_dict(data.get("probe_report"))
+    zendesk_result = _as_dict(data.get("zendesk_result"))
+    sections = [
+        "## File ticket workflow",
+        "",
+        format_zendesk_preview_md(zendesk_result),
+        "",
+        format_probe_report_md(probe_report),
+    ]
+    return "\n".join(section for section in sections if section)
+
+
 def format_zendesk_html(results: list[dict[str, Any]]) -> str:
     """Combine all cached results into an HTML body for Zendesk html_body."""
     sections: list[str] = []
@@ -374,66 +399,54 @@ def format_zendesk_html(results: list[dict[str, Any]]) -> str:
     return "<br>".join(sections) if sections else "<p>No probe results cached.</p>"
 
 
-def render_probe_report_app(data: dict[str, Any] | None) -> str:
-    """Render the combined probe MCP App from the most recent cached result."""
-    if not data:
-        return _render_empty_page(
-            title="Probe report",
-            eyebrow="Probe",
-            message="Run probe_tool to populate the combined diagnostic report.",
-        )
-
+def _probe_report_context(data: dict[str, Any]) -> dict[str, Any]:
+    """Collect the derived values used by the combined probe renderers."""
     site_health = _as_dict(data.get("site_health"))
-    identity = _as_dict(site_health.get("identity"))
-    infrastructure = _as_dict(site_health.get("infrastructure"))
     rest_api = _as_dict(site_health.get("rest_api"))
     content = _as_dict(site_health.get("content"))
-    namespaces = [ns for ns in _as_list(rest_api.get("namespaces")) if isinstance(ns, str)]
-    cdn = [name for name in _as_list(site_health.get("cdn")) if isinstance(name, str)]
-
     plugin_status = _as_dict(data.get("plugin_status"))
-    plugins = _dicts_from_list(plugin_status.get("plugins"))
-
     security_findings = _as_dict(data.get("security_findings"))
     findings = _dicts_from_list(security_findings.get("findings"))
-    xmlrpc = _as_dict(security_findings.get("xmlrpc"))
-    review_findings = sum(
-        1
-        for finding in findings
-        if finding.get("severity") in {"warning", "critical"}
-    )
+    return {
+        "url": data.get("url", "unknown"),
+        "timestamp": data.get("timestamp", "-"),
+        "identity": _as_dict(site_health.get("identity")),
+        "infrastructure": _as_dict(site_health.get("infrastructure")),
+        "rest_api": rest_api,
+        "content": content,
+        "namespaces": [
+            ns for ns in _as_list(rest_api.get("namespaces")) if isinstance(ns, str)
+        ],
+        "cdn": [name for name in _as_list(site_health.get("cdn")) if isinstance(name, str)],
+        "plugins": _dicts_from_list(plugin_status.get("plugins")),
+        "findings": findings,
+        "xmlrpc": _as_dict(security_findings.get("xmlrpc")),
+        "review_findings": sum(
+            1
+            for finding in findings
+            if finding.get("severity") in {"warning", "critical"}
+        ),
+    }
 
-    cards = _render_cards(
-        [
-            _metric_card(
-                "Cache",
-                infrastructure.get("x-cache", "unknown"),
-                "Homepage cache state",
-            ),
-            _metric_card(
-                "TTFB",
-                _format_ttfb(infrastructure.get("ttfb_seconds")),
-                "Time to first byte for the homepage",
-            ),
-            _metric_card(
-                "Plugins",
-                len(plugins),
-                "Detected plugins with status metadata",
-            ),
-            _metric_card(
-                "Needs review",
-                review_findings,
-                "Warning or critical security findings",
-            ),
-        ]
-    )
+
+def _render_probe_report_sections(context: dict[str, Any]) -> list[str]:
+    """Render the shared section stack used by combined workflow apps."""
+    identity = _as_dict(context.get("identity"))
+    infrastructure = _as_dict(context.get("infrastructure"))
+    rest_api = _as_dict(context.get("rest_api"))
+    content = _as_dict(context.get("content"))
+    namespaces = [ns for ns in _as_list(context.get("namespaces")) if isinstance(ns, str)]
+    cdn = [name for name in _as_list(context.get("cdn")) if isinstance(name, str)]
+    plugins = _dicts_from_list(context.get("plugins"))
+    findings = _dicts_from_list(context.get("findings"))
+    xmlrpc = _as_dict(context.get("xmlrpc"))
 
     sections = [
         _render_key_value_section(
             "Report summary",
             {
-                "url": data.get("url", "unknown"),
-                "generated_at": data.get("timestamp", "-"),
+                "url": context.get("url", "unknown"),
+                "generated_at": context.get("timestamp", "-"),
                 "rest_api_status": rest_api.get("status", "unknown"),
                 "routes": content.get("route_count", "-"),
             },
@@ -470,9 +483,51 @@ def render_probe_report_app(data: dict[str, Any] | None) -> str:
     if xmlrpc:
         sections.append(_render_xmlrpc_section(xmlrpc))
     sections.append(_render_findings_section(findings))
+    return sections
 
-    subtitle_parts = [_display_value(data.get("url", "unknown"))]
-    if timestamp := data.get("timestamp"):
+
+def render_probe_report_app(data: dict[str, Any] | None) -> str:
+    """Render the combined probe MCP App from the most recent cached result."""
+    if not data:
+        return _render_empty_page(
+            title="Probe report",
+            eyebrow="Probe",
+            message="Run probe_tool to populate the combined diagnostic report.",
+        )
+
+    context = _probe_report_context(data)
+    infrastructure = _as_dict(context.get("infrastructure"))
+    plugins = _dicts_from_list(context.get("plugins"))
+    review_findings = context.get("review_findings", 0)
+
+    cards = _render_cards(
+        [
+            _metric_card(
+                "Cache",
+                infrastructure.get("x-cache", "unknown"),
+                "Homepage cache state",
+            ),
+            _metric_card(
+                "TTFB",
+                _format_ttfb(infrastructure.get("ttfb_seconds")),
+                "Time to first byte for the homepage",
+            ),
+            _metric_card(
+                "Plugins",
+                len(plugins),
+                "Detected plugins with status metadata",
+            ),
+            _metric_card(
+                "Needs review",
+                review_findings,
+                "Warning or critical security findings",
+            ),
+        ]
+    )
+    sections = _render_probe_report_sections(context)
+
+    subtitle_parts = [_display_value(context.get("url", "unknown"))]
+    if timestamp := context.get("timestamp"):
         subtitle_parts.append(f"Generated {timestamp}")
 
     return _render_page(
@@ -489,6 +544,103 @@ def render_probe_report_app_shell() -> str:
         title="Probe report",
         eyebrow="Probe",
         waiting_message="Run probe_tool to populate the combined diagnostic report.",
+    )
+
+
+def render_file_ticket_app(data: dict[str, Any] | None) -> str:
+    """Render the file_ticket MCP App from the most recent workflow result."""
+    if not data:
+        return _render_empty_page(
+            title="File ticket",
+            eyebrow="File ticket",
+            message="Run file_ticket_tool to probe a site and preview or create the Zendesk ticket.",
+        )
+
+    probe_report = _as_dict(data.get("probe_report"))
+    zendesk_result = _as_dict(data.get("zendesk_result"))
+    payload = _as_dict(zendesk_result.get("payload"))
+    ticket_payload = _as_dict(payload.get("ticket"))
+    context = _probe_report_context(probe_report)
+
+    cards = _render_cards(
+        [
+            _metric_card(
+                "Mode",
+                zendesk_result.get("mode", zendesk_result.get("status", "unknown")),
+                "Dry-run preview or live Zendesk result",
+            ),
+            _metric_card(
+                "Action",
+                zendesk_result.get("action", "create"),
+                "Zendesk operation performed by this workflow",
+            ),
+            _metric_card(
+                "Ticket",
+                zendesk_result.get("ticket_id") or "new",
+                "Existing or newly created ticket id",
+            ),
+            _metric_card(
+                "Needs review",
+                context.get("review_findings", 0),
+                "Warning or critical security findings included in the ticket",
+            ),
+        ]
+    )
+
+    sections = [
+        _render_key_value_section(
+            "Zendesk summary",
+            {
+                "probed_url": zendesk_result.get("probed_url", probe_report.get("url", "unknown")),
+                "subject": ticket_payload.get("subject", ""),
+                "priority": ticket_payload.get("priority", ""),
+                "mode": zendesk_result.get("mode", zendesk_result.get("status", "unknown")),
+                "ticket_id": zendesk_result.get("ticket_id") or "new",
+                "ticket_url": zendesk_result.get("ticket_url", ""),
+                "note": zendesk_result.get("note", ""),
+            },
+        )
+    ]
+    if error := zendesk_result.get("error"):
+        sections.append(_render_code_section("Error", str(error)))
+    elif payload:
+        sections.append(
+            _render_code_section("Payload", json.dumps(payload, indent=2, sort_keys=True))
+        )
+    elif detail := zendesk_result.get("detail"):
+        sections.append(_render_code_section("Response detail", str(detail)))
+
+    sections.append(
+        _render_intro_section(
+            "Probe report",
+            "Diagnostic findings collected before the Zendesk action.",
+        )
+    )
+    sections.extend(_render_probe_report_sections(context))
+
+    subtitle_parts = [
+        _display_value(probe_report.get("url", data.get("url", "unknown"))),
+        _display_value(zendesk_result.get("mode", zendesk_result.get("status", "unknown"))),
+    ]
+    if ticket_id := zendesk_result.get("ticket_id"):
+        subtitle_parts.append(f"Ticket {ticket_id}")
+    elif timestamp := probe_report.get("timestamp"):
+        subtitle_parts.append(f"Generated {timestamp}")
+
+    return _render_page(
+        title="File ticket",
+        eyebrow="File ticket",
+        subtitle=_safe_text(" | ".join(subtitle_parts)),
+        body=cards + _wrap_sections(sections),
+    )
+
+
+def render_file_ticket_app_shell() -> str:
+    """Render the static file_ticket MCP App shell."""
+    return _render_app_shell(
+        title="File ticket",
+        eyebrow="File ticket",
+        waiting_message="Run file_ticket_tool to probe a site and preview or create the Zendesk ticket.",
     )
 
 
