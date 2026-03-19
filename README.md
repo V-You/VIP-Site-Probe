@@ -46,19 +46,20 @@ python -m vip_site_probe
 
 | Tool | Description |
 |------|-------------|
+| `file_ticket_tool` | Full workflow tool -- runs the combined probe and then previews or creates a Zendesk ticket in one MCP App |
 | `probe_tool` | Full combined diagnostic -- runs site health, plugin status, and security checks in one MCP App |
 | `probe_site_tool` | Full site diagnostic -- identity, infrastructure, REST API, CDN |
 | `check_plugins_tool` | Plugin discovery via REST API namespaces + wordpress.org cross-reference |
 | `check_security_tool` | Security exposure scan -- xmlrpc, user enum, headers, directory listing |
-| `submit_to_zendesk_tool` | Push findings to Zendesk (create ticket or add internal note) |
+| `submit_to_zendesk_tool` | Push the latest cached probe findings to Zendesk as a new ticket or internal note |
 
 ## Skills
 
 | Skill | Description |
 |-------|-------------|
-| `/probe {url}` | Run all three probes and present a unified report |
-| `/file-ticket {url}` | Full probe + create a Zendesk ticket |
-| `/add-to-ticket {url} {ticket_id}` | Full probe + add internal note to existing ticket |
+| `/probe {url}` | Call `probe_tool` and present the unified probe report |
+| `/file-ticket {url}` | Call `file_ticket_tool` and return one rich workflow card for the probe plus Zendesk create flow |
+| `/add-to-ticket {url} {ticket_id}` | Run the full probe workflow, then call `submit_to_zendesk_tool` with `action="update"` to add an internal note |
 
 ## Configuration
 
