@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import urlparse
 
+from vip_site_probe.cache import cache
 from vip_site_probe.probes.plugins import check_plugins
 from vip_site_probe.probes.security import check_security
 from vip_site_probe.probes.site import probe_site
@@ -16,6 +17,10 @@ async def probe(url: str) -> dict[str, Any]:
     parsed = urlparse(url)
     if not parsed.scheme:
         url = f"https://{url}"
+        parsed = urlparse(url)
+
+    base = f"{parsed.scheme}://{parsed.netloc}"
+    cache.begin(base)
 
     site_health = await probe_site(url)
     plugin_status = await check_plugins(url)

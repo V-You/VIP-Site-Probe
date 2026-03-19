@@ -17,32 +17,55 @@ class ProbeResult:
 
 @dataclass
 class ResultCache:
-    """Stores the most recent probe results so submit_to_zendesk can reference them."""
+    """Stores probe results per URL so follow-up actions use a coherent bucket."""
 
-    _results: dict[str, ProbeResult] = field(default_factory=dict)
+    _results_by_url: dict[str, dict[str, ProbeResult]] = field(default_factory=dict)
+    _latest_url: str | None = None
+
+    def begin(self, url: str) -> None:
+        """Start a fresh result bucket for a combined probe run."""
+        self._results_by_url[url] = {}
+        self._latest_url = url
 
     def store(self, tool: str, url: str, data: dict[str, Any]) -> None:
         """Cache a probe result, keyed by tool name."""
-        self._results[tool] = ProbeResult(url=url, tool=tool, data=data)
+        bucket = self._results_by_url.setdefault(url, {})
+        bucket[tool] = ProbeResult(url=url, tool=tool, data=data)
+        self._latest_url = url
 
-    def get(self, tool: str) -> ProbeResult | None:
+    def get(self, tool: str, url: str | None = None) -> ProbeResult | None:
         """Retrieve cached result for a given tool, or None."""
-        return self._results.get(tool)
+        target_url = url or self._latest_url
+        if target_url is None:
+            return None
+        return self._results_by_url.get(target_url, {}).get(tool)
 
-    def get_all(self) -> list[ProbeResult]:
-        """Return all cached results."""
-        return list(self._results.values())
+    def get_all(self, url: str | None = None) -> list[ProbeResult]:
+        """Return cached results for the latest URL bucket by default."""
+        target_url = url or self._latest_url
+        if target_url is None:
+            return []
+
+        bucket = self._results_by_url.get(target_url, {})
+        preferred_order = ("probe_site", "check_plugins", "check_security", "probe")
+        ordered = [bucket[tool] for tool in preferred_order if tool in bucket]
+        extras = [result for tool, result in bucket.items() if tool not in preferred_order]
+        return ordered + extras
 
     def last_url(self) -> str | None:
         """Return the URL from the most recently cached result."""
-        if not self._results:
-            return None
-        last = list(self._results.values())[-1]
-        return last.url
+        return self._latest_url
 
-    def clear(self) -> None:
-        """Clear all cached results."""
-        self._results.clear()
+    def clear(self, url: str | None = None) -> None:
+        """Clear all cached results, or just one URL bucket."""
+        if url is None:
+            self._results_by_url.clear()
+            self._latest_url = None
+            return
+
+        self._results_by_url.pop(url, None)
+        if self._latest_url == url:
+            self._latest_url = next(reversed(self._results_by_url), None)
 
 
 # singleton instance shared across the server

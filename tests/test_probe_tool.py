@@ -2,9 +2,10 @@ import re
 
 from fastmcp.tools import ToolResult
 
-from vip_site_probe.cache import cache
+from vip_site_probe.cache import ResultCache, cache
 from vip_site_probe.probes.report import probe
 from vip_site_probe.server import probe_report_app_resource, probe_tool
+from vip_site_probe.zendesk import submit_to_zendesk
 
 
 async def test_probe_combines_results_without_caching_report(monkeypatch) -> None:
@@ -133,3 +134,67 @@ def test_probe_report_app_resource_uses_client_side_result_handler() -> None:
     assert "app.ontoolresult" in rendered
     assert "structuredContent" in rendered
     assert "Waiting for tool result" in rendered
+
+
+def test_result_cache_tracks_latest_url_across_tool_updates() -> None:
+    result_cache = ResultCache()
+
+    result_cache.store("probe_site", "https://blog.microsoft.com", {"url": "https://blog.microsoft.com"})
+    result_cache.store(
+        "check_plugins",
+        "https://blog.microsoft.com",
+        {"url": "https://blog.microsoft.com", "plugins": []},
+    )
+    result_cache.store(
+        "check_security",
+        "https://blog.microsoft.com",
+        {"url": "https://blog.microsoft.com", "findings": []},
+    )
+    result_cache.store("probe_site", "https://blogs.microsoft.com", {"url": "https://blogs.microsoft.com"})
+
+    assert result_cache.last_url() == "https://blogs.microsoft.com"
+    assert [item.tool for item in result_cache.get_all()] == ["probe_site"]
+
+
+async def test_submit_to_zendesk_uses_latest_url_bucket_only() -> None:
+    cache.clear()
+    try:
+        cache.store("probe_site", "https://blog.microsoft.com", {"url": "https://blog.microsoft.com"})
+        cache.store(
+            "check_plugins",
+            "https://blog.microsoft.com",
+            {"url": "https://blog.microsoft.com", "plugins": []},
+        )
+        cache.store(
+            "check_security",
+            "https://blog.microsoft.com",
+            {
+                "url": "https://blog.microsoft.com",
+                "findings": [
+                    {
+                        "severity": "warning",
+                        "label": "Old finding",
+                        "detail": "Should not leak into the next ticket preview.",
+                    }
+                ],
+            },
+        )
+
+        cache.store(
+            "probe_site",
+            "https://blogs.microsoft.com",
+            {
+                "url": "https://blogs.microsoft.com",
+                "identity": {"name": "Microsoft Blogs"},
+            },
+        )
+
+        result = await submit_to_zendesk(action="create")
+
+        assert result["probed_url"] == "https://blogs.microsoft.com"
+        html_body = result["payload"]["ticket"]["comment"]["html_body"]
+        assert "https://blogs.microsoft.com" in html_body
+        assert "Old finding" not in html_body
+        assert "https://blog.microsoft.com" not in html_body
+    finally:
+        cache.clear()
